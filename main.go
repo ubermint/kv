@@ -1,41 +1,41 @@
 package main
 
 import (
-    "fmt"
-    "log"
-    "github.com/ubermint/kv/storage"
+	"fmt"
+	"github.com/ubermint/kv/storage"
+	"log"
 )
 
 func main() {
-    var db storage.Storage
-    //err := db.New("/home/mint/Desktop/диплом/проект/kv/test/")
-    err := db.New("test")
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer db.Close()
+	var db storage.Storage
 
-    db.Set([]byte("idiot"), []byte("dostoevsky"))
+	err := db.New("test")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
-    val, err := db.Get([]byte("idiot"))
-    if err != nil {
-        fmt.Println(err)
-    }
-    log.Println("Length of the map: ",  len(db.MemTable), string(val))
+	db.Set([]byte("idiot"), []byte("dostoevsky"))
 
-    db.Update([]byte("idiot"), []byte("dostoevsky2"))
+	val, err := db.Get([]byte("idiot"))
+	if err != nil {
+		fmt.Println(err)
+	}
+	log.Println("Length of the map: ", len(db.MemTable), string(val))
 
-    val, err = db.Get([]byte("idiot"))
-    if err != nil {
-        fmt.Println(err)
-    }
+	db.Update([]byte("idiot"), []byte("dostoevsky2"))
 
-    log.Println("Length of the map: ",  len(db.MemTable), string(val))
+	val, err = db.Get([]byte("idiot"))
+	if err != nil {
+		fmt.Println(err)
+	}
 
-    db.Delete([]byte("idiot"))
-    val, err = db.Get([]byte("idiot"))
-    if err != nil {
-        fmt.Println(err)
-    }
-    log.Println("Length of the map: ",  len(db.MemTable), string(val))
+	log.Println("Length of the map: ", len(db.MemTable), string(val))
+
+	db.Delete([]byte("idiot"))
+	val, err = db.Get([]byte("idiot"))
+	if err != nil {
+		fmt.Println(err)
+	}
+	log.Println("Length of the map: ", len(db.MemTable), string(val))
 }

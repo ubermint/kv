@@ -1,26 +1,42 @@
-Disk based Log Structured Hash Table Store
+Дискове сховище пар ключів і значень на основі лог-структурованих хеш-таблиць.
 
-Features
-    Low latency for reads and writes
-    High throughput
-    Easy to back up / restore
-    Simple and easy to understand
-    Store data much larger than the RAM
+Особливості
+    - Низька затримка для читання та запису
+    - Висока пропускна здатність
+    - Легке резервне копіювання / відновлення
+    - Простий і зрозумілий інтерфейс
+    - Зберігає дані об'ємом набагато більшим, ніж оперативна пам'ять
+
+### Формат записів, для збережена пар ключ-значення на диску, виглядає так:
+   ┌───────────┬──────────┬────────────┬─────┬───────┐
+   │ timestamp │ key_size │ value_size │ key │ value │
+   └───────────┴──────────┴────────────┴─────┴───────┘
+
+Перші 4 байти є 32-бітним цілим числом, що представляє CRC.
+Наступні 4 байти є 32-бітним цілим числом, яке представляє мітку часу.
+Наступні 8 байтів є двома 32-розрядними цілими числами, що представляють розмір ключа та розмір значення.
+Решта байтів є нашим ключем і значенням.
 
 
-# Our key value pair, when stored on disk looks like this:
-#   ┌───────────┬──────────┬────────────┬─────┬───────┐
-#   │ timestamp │ key_size │ value_size │ key │ value │
-#   └───────────┴──────────┴────────────┴─────┴───────┘
+Модуль `format` забезпечує функції кодування/декодування для операцій серіалізації та десеріалізації записів.
 
-1st 4 bytes are a 32-bit integer representing CRC.
-The following 4 bytes are a 32-bit integer representing epoch timestamp.
-The following 8 bytes are two 32-bit integers representing keysize and valuesize.
-The remaining bytes are our key and value.
+Модуль `storage` реалізує клас Storage, який представляє інтерфейс KV, керує ініціалізацією сховища, оновлює внутрішню таблицю пам'яті, виконує операції читання та запису у файли.
 
+### Використання:
+'''go
+    var db storage.Storage
 
-`format` module provides encode/decode functions for serialisation and deserialisation operations
+    err := db.New("test")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer db.Close()
 
-`disk_store` module implements DiskStorage class which implements the KV store on the disk
+    db.Set([]byte("idiot"), []byte("dostoevsky"))
 
-`node` module is a kv storage node server procces
+    val, err := db.Get([]byte("idiot"))
+    if err != nil {
+        log.Println(err)
+    }
+    log.Println("Value: ", string(val))
+```
