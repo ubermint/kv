@@ -21,6 +21,7 @@ type Header struct {
 	ValueSize uint32
 }
 
+ 
 func (h Header) encode() []byte {
 	headerBuffer := make([]byte, HEADER_SIZE)
 
@@ -74,7 +75,7 @@ func (rec *KVRecord) Decode(reader io.Reader) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-
+	
 	var header Header
 
 	err = binary.Read(reader, binary.LittleEndian, &header)
@@ -124,6 +125,7 @@ func (rec *KVRecord) Encode() (*bytes.Buffer, error) {
 	buf.Write(headerBytes)
 	buf.Write(rec.Key)
 	buf.Write(rec.Value)
+
 
 	crc := crc32.NewIEEE()
 	crc.Write(buf.Bytes())

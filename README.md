@@ -20,26 +20,26 @@
 
 ---
 
-Модуль `format` забезпечує функції кодування/декодування для операцій серіалізації та десеріалізації записів.
+Модуль `format` забезпечує функції кодування/декодування cеріалізації та десеріалізації записів у бінарний формат.
 
 Модуль `storage` реалізує клас Storage, який представляє інтерфейс KV, керує ініціалізацією сховища, оновлює внутрішню таблицю пам'яті, виконує операції читання та запису у файли.
 
 ### Використання:
 ```go
-    var db storage.Storage
+var db storage.Storage
 
-    err := db.New("test")
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer db.Close()
+err := db.New("test")
+if err != nil {
+    log.Fatal(err)
+}
+defer db.Close()
 
-    db.Set([]byte("idiot"), []byte("dostoevsky"))
+db.Set([]byte("idiot"), []byte("dostoevsky"))
 
-    val, err := db.Get([]byte("idiot"))
-    if err != nil {
-        log.Println(err)
-    }
+val, err := db.Get([]byte("idiot"))
+if err != nil {
+    log.Println(err)
+}
 
-    log.Println("Value: ", string(val))
+log.Println("Value: ", string(val))
 ```

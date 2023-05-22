@@ -22,7 +22,6 @@ type Storage struct {
 func (db *Storage) Build(files []string) error {
 	sort.Strings(files)
 	for _, datafile := range files {
-		fmt.Println(datafile)
 		file, err := os.Open(datafile)
 		if err != nil {
 			return err
@@ -58,7 +57,7 @@ func (db *Storage) Build(files []string) error {
 		file.Close()
 	}
 
-	log.Println("Length of the map: ", len(db.MemTable))
+	log.Println("Restored: ", len(db.MemTable), " key-value pairs.")
 
 	return nil
 }
@@ -80,7 +79,7 @@ func (db *Storage) New(dirPath string) error {
 
 	datafiles, err := filepath.Glob(filepath.Join(dirPath, "Data*"))
 	if err != nil {
-		return fmt.Errorf("Error: Can't parse datafiles.", err)
+		return fmt.Errorf("Error: Can't parse datafiles: %s", err)
 	}
 
 	fileID := uint32(time.Now().Unix())
@@ -91,6 +90,7 @@ func (db *Storage) New(dirPath string) error {
 	if err != nil {
 		return err
 	}
+
 
 	db.BaseDir = dirPath
 	db.File = file
@@ -192,6 +192,7 @@ func (db *Storage) Get(key []byte) ([]byte, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	_, err = file.Seek(stat.ValPos, 0)
 	if err != nil {
 		log.Fatal(err)

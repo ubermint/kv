@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ubermint/kv/format"
 	"hash/fnv"
+	_ "log"
 )
 
 type ValStat struct {
