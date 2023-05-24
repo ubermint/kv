@@ -20,7 +20,9 @@ func (db *Storage) MemTableUpdate(kv_rec format.KVRecord, fileID uint32, valPos 
 	hashKey := hash.Sum(nil)
 
 	stat := ValStat{fileID, kv_rec.Timestamp, kv_rec.ValueSize, valPos}
+	db.MemLock.Lock()
 	db.MemTable[string(hashKey)] = stat
+	db.MemLock.Unlock()
 }
 
 func (db *Storage) MemTableSeek(key []byte) (ValStat, error) {
@@ -28,7 +30,9 @@ func (db *Storage) MemTableSeek(key []byte) (ValStat, error) {
 	hash.Write(key)
 	hashKey := hash.Sum(nil)
 
+	db.MemLock.RLock()
 	stat, exist := db.MemTable[string(hashKey)]
+	db.MemLock.RUnlock()
 
 	if exist {
 		return stat, nil
@@ -42,10 +46,14 @@ func (db *Storage) MemTableDelete(key []byte) error {
 	hash.Write(key)
 	hashKey := hash.Sum(nil)
 
+	db.MemLock.RLock()
 	_, exist := db.MemTable[string(hashKey)]
+	db.MemLock.RUnlock()
 
 	if exist {
+		db.MemLock.Lock()
 		delete(db.MemTable, string(hashKey))
+		db.MemLock.Unlock()
 		return nil
 	}
 

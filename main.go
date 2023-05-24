@@ -7,34 +7,35 @@ import (
 )
 
 func main() {
+
 	var db storage.Storage
 
 	err := db.New("test")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
+	defer db.Destroy()
 
-	db.Set([]byte("idiot"), []byte("dostoevsky"))
+	db.Set([]byte("test"), []byte("value"))
 
-	val, err := db.Get([]byte("idiot"))
+	val, err := db.Get([]byte("test"))
 	if err != nil {
 		fmt.Println(err)
 	}
 	log.Println("Length of the map: ", len(db.MemTable), string(val))
 
-	db.Update([]byte("idiot"), []byte("dostoevsky2"))
+	db.Update([]byte("test"), []byte("value2"))
 
-	val, err = db.Get([]byte("idiot"))
+	val, err = db.Get([]byte("test"))
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	log.Println("Length of the map: ", len(db.MemTable), string(val))
 
-	db.Delete([]byte("idiot"))
-	val, err = db.Get([]byte("idiot"))
-	if err != nil {
+	db.Delete([]byte("test"))
+	val, err = db.Get([]byte("test"))
+	if err == nil {
 		fmt.Println(err)
 	}
 	log.Println("Length of the map: ", len(db.MemTable), string(val))

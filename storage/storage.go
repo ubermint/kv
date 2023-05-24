@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -17,6 +18,8 @@ type Storage struct {
 	ID       uint32
 	File     *os.File
 	MemTable map[string]ValStat
+	MemLock  sync.RWMutex
+	FileLock sync.RWMutex
 }
 
 func (db *Storage) Build(files []string) error {
@@ -91,7 +94,6 @@ func (db *Storage) New(dirPath string) error {
 		return err
 	}
 
-
 	db.BaseDir = dirPath
 	db.File = file
 	db.ID = fileID
@@ -134,7 +136,6 @@ func (db *Storage) Destroy() error {
 		}
 	}
 
-	//log.Println("Datafiles removed")
 	return err
 }
 
@@ -150,6 +151,7 @@ func (db *Storage) Set(key []byte, value []byte) error {
 		return err
 	}
 
+	db.FileLock.Lock()
 	position, err := db.File.Seek(0, os.SEEK_END)
 	if err != nil {
 		log.Println("Failed to get current position:", err)
@@ -160,6 +162,7 @@ func (db *Storage) Set(key []byte, value []byte) error {
 	if err != nil {
 		return err
 	}
+	db.FileLock.Unlock()
 
 	db.MemTableUpdate(kv_rec, db.ID, position)
 
@@ -193,6 +196,7 @@ func (db *Storage) Get(key []byte) ([]byte, error) {
 		log.Fatal(err)
 	}
 
+	db.FileLock.Lock()
 	_, err = file.Seek(stat.ValPos, 0)
 	if err != nil {
 		log.Fatal(err)
@@ -208,6 +212,7 @@ func (db *Storage) Get(key []byte) ([]byte, error) {
 	if file != db.File {
 		file.Close()
 	}
+	db.FileLock.Unlock()
 
 	return kv_rec.Value, nil
 }

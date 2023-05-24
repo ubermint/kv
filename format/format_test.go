@@ -8,18 +8,18 @@ import (
 )
 
 func TestKVRecordSize(t *testing.T) {
-	key := []byte("idiot")
-	value := []byte("dostoevsky")
+	key := []byte("test")
+	value := []byte("value")
 
 	var kv_rec KVRecord
 	err := kv_rec.New(key, value)
 	if err != nil {
-		// handle error
+		t.Errorf("Failed.")
 	}
 
 	myBuffer, err := kv_rec.Encode()
 	if err != nil {
-		// handle error
+		t.Errorf("Failed.")
 	}
 
 	sizer := binary.Size(kv_rec.Timestamp) + binary.Size(kv_rec.KeySize) +
@@ -33,18 +33,18 @@ func TestKVRecordSize(t *testing.T) {
 }
 
 func TestKVZeroRecord(t *testing.T) {
-	key := []byte("idiot")
+	key := []byte("test")
 	value := []byte{}
 
 	var kv_rec KVRecord
 	err := kv_rec.New(key, value)
 	if err != nil {
-		// handle error
+		t.Errorf("Failed.")
 	}
 
 	myBuffer, err := kv_rec.Encode()
 	if err != nil {
-		// handle error
+		t.Errorf("Failed.")
 	}
 
 	sizer := binary.Size(kv_rec.Timestamp) + binary.Size(kv_rec.KeySize) +
@@ -64,12 +64,12 @@ func TestKVRecordEncoding(t *testing.T) {
 	var kv_rec KVRecord
 	err := kv_rec.New(key, value)
 	if err != nil {
-		// handle error
+		t.Errorf("Failed.")
 	}
 
 	myBuffer, err := kv_rec.Encode()
 	if err != nil {
-		// handle error
+		t.Errorf("Failed.")
 	}
 
 	var kv_rec2 KVRecord

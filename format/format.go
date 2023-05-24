@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"hash/crc32"
 	"io"
+	"log"
 	"math"
 	"time"
 )
@@ -21,7 +22,6 @@ type Header struct {
 	ValueSize uint32
 }
 
- 
 func (h Header) encode() []byte {
 	headerBuffer := make([]byte, HEADER_SIZE)
 
@@ -68,18 +68,23 @@ func (rec *KVRecord) New(key []byte, value []byte) error {
 	return nil
 }
 
-
 func (rec *KVRecord) Decode(reader io.Reader) (int, error) {
 	var rec_checksum uint32
 	err := binary.Read(reader, binary.LittleEndian, &rec_checksum)
 	if err != nil {
+		if err != io.EOF && err != io.ErrUnexpectedEOF {
+			log.Fatalf("Err %s", err)
+		}
 		return 0, err
 	}
-	
+
 	var header Header
 
 	err = binary.Read(reader, binary.LittleEndian, &header)
 	if err != nil {
+		if err != io.EOF && err != io.ErrUnexpectedEOF {
+			log.Fatalf("Err %s", err)
+		}
 		return 0, err
 	}
 	rec.Header = header
@@ -87,6 +92,9 @@ func (rec *KVRecord) Decode(reader io.Reader) (int, error) {
 	key := make([]byte, header.KeySize)
 	err = binary.Read(reader, binary.LittleEndian, key)
 	if err != nil {
+		if err != io.EOF && err != io.ErrUnexpectedEOF {
+			log.Fatalf("Err %s", err)
+		}
 		return 0, err
 	}
 	rec.Key = key
@@ -94,6 +102,9 @@ func (rec *KVRecord) Decode(reader io.Reader) (int, error) {
 	value := make([]byte, header.ValueSize)
 	err = binary.Read(reader, binary.LittleEndian, value)
 	if err != nil {
+		if err != io.EOF && err != io.ErrUnexpectedEOF {
+			log.Fatalf("Err %s", err)
+		}
 		return 0, err
 	}
 	rec.Value = value
@@ -125,7 +136,6 @@ func (rec *KVRecord) Encode() (*bytes.Buffer, error) {
 	buf.Write(headerBytes)
 	buf.Write(rec.Key)
 	buf.Write(rec.Value)
-
 
 	crc := crc32.NewIEEE()
 	crc.Write(buf.Bytes())
