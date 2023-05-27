@@ -13,7 +13,7 @@ func TestKVMethods(t *testing.T) {
 	var db Storage
 	err := db.New("test")
 	if err != nil {
-		// handle error
+		t.Errorf("Failed: %s.", err)
 	}
 	defer db.Destroy()
 
@@ -74,7 +74,7 @@ func TestKVLoad(t *testing.T) {
 	for key, value := range hashTable {
 		diskval, err := storage.Get([]byte(key))
 		if err != nil {
-			// handle error
+			t.Errorf("Failed: %s.", err)
 		}
 
 		if string(diskval) == value {
@@ -85,7 +85,7 @@ func TestKVLoad(t *testing.T) {
 	for key, _ := range hashTable {
 		err = storage.Delete([]byte(key))
 		if err != nil {
-			// handle error
+			t.Errorf("Failed: %s.", err)
 		}
 
 	}
@@ -106,7 +106,7 @@ func TestKVSetup(t *testing.T) {
 	var storage Storage
 	err := storage.New("test-build")
 	if err != nil {
-		// handle error
+		t.Errorf("Failed: %s.", err)
 	}
 
 	for i := 1; i <= 10000; i++ {
@@ -151,14 +151,14 @@ func TestKVBuild(t *testing.T) {
 	var storage2 Storage
 	err := storage2.New("test-build")
 	if err != nil {
-		// handle error
+		t.Errorf("Failed: %s.", err)
 	}
 
 	x := 0
 	for key, value := range hashTable {
 		diskval, err := storage2.Get([]byte(key))
 		if err != nil {
-			// handle error
+			t.Errorf("Failed: %s.", err)
 		}
 
 		if string(diskval) == value {

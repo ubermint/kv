@@ -2,12 +2,13 @@ package format
 
 import (
 	"encoding/binary"
-	"fmt"
+	"log"
 	"reflect"
 	"testing"
 )
 
 func TestKVRecordSize(t *testing.T) {
+	log.SetFlags(log.Ltime | log.Lmicroseconds)
 	key := []byte("test")
 	value := []byte("value")
 
@@ -25,7 +26,7 @@ func TestKVRecordSize(t *testing.T) {
 	sizer := binary.Size(kv_rec.Timestamp) + binary.Size(kv_rec.KeySize) +
 		binary.Size(kv_rec.ValueSize) + len(key) + len(value)
 
-	fmt.Println(myBuffer.Len(), sizer)
+	log.Println(myBuffer.Len(), sizer)
 
 	if myBuffer.Len()-CRC_SIZE != sizer {
 		t.Errorf("Failed. Encoding is not equal in size.")
@@ -50,7 +51,7 @@ func TestKVZeroRecord(t *testing.T) {
 	sizer := binary.Size(kv_rec.Timestamp) + binary.Size(kv_rec.KeySize) +
 		binary.Size(kv_rec.ValueSize) + len(key) + len(value)
 
-	fmt.Println(myBuffer.Len(), sizer)
+	log.Println(myBuffer.Len(), sizer)
 
 	if myBuffer.Len()-CRC_SIZE != sizer {
 		t.Errorf("Failed. Encoding is not equal in size.")
